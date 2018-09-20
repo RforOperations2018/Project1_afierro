@@ -35,15 +35,6 @@ sidebar <- dashboardSidebar(
     menuItem("SparkPlot", icon = icon("money"), tabName = "Spark Grants"),
     menuItem("BenedumPlot", icon = icon("money"), tabName = "Benedum Grants"),
 #    menuItem("Table", icon = icon("table"), tabName = "table", badgeLabel = "new", badgeColor = "green"),
-    #Benedum Selection
-      sliderInput("BenedumSelect",
-                  "Grant Amount:",
-                  min = min(Ben$Amt, na.rm = T),
-                  max = max(Ben$Amt, na.rm = T),
-                  value = c(min(Ben$Amt, na.rm = T), max(Ben$Amt, na.rm = T)),
-                step = 1)
-  )
-)
 
 body <- dashboardBody(tabItems(
   tabItem("APOSTPlot",
@@ -86,6 +77,14 @@ body <- dashboardBody(tabItems(
  ),
   tabItem("BenedumPlot",
           fluidRow(
+            box(sliderInput("BenedumSelect",
+                            "Grant Amount:",
+                            min = min(Ben$Amt, na.rm = T),
+                            max = max(Ben$Amt, na.rm = T),
+                            value = c(min(Ben$Amt, na.rm = T), max(Ben$Amt, na.rm = T)),
+                                  step = 1)
+            )
+          )),
             infoBoxOutput("mass"),
             valueBoxOutput("height")
           ),
@@ -105,28 +104,37 @@ ui <- dashboardPage(header, sidebar, body)
 
 # Define server logic
 server <- function(input, output) {
-  swInput <- reactive({
-    starwars <- starwars.load %>%
-      # Slider Filter
-      filter(birth_year >= input$birthSelect[1] & birth_year <= input$birthSelect[2])
-    # Homeworld Filter
-    if (length(input$worldSelect) > 0 ) {
-      starwars <- subset(starwars, homeworld %in% input$worldSelect)
+  APOSTInput <- reactive({
+    DF <- APOST
+    # ORG Filter
+    if (length(input$APOSTSelect) > 0 ) {
+      DF <- subset(DF, Organization %in% input$APOSTSelect)
     }
     
-    return(starwars)
+    return(DF)
   })
   # Reactive melted data
-  mwInput <- reactive({
-    swInput() %>%
-      melt(id = "name")
+  mAPOSTInput <- reactive({
+    mAPOST <- melt(APOSTInput(), id.vars = "Organization")
+    mAPOST$variable <- NULL
+    
+    return(mAPOST)
   })
-  # A plot showing the mass of characters
+  # APOST Plot
   output$plot_mass <- renderPlotly({
-    dat <- subset(mwInput(), variable == "mass")
+    mAPOSTInput() %>% 
+      drop_na(value) %>%
+      ggplot(aes(x = value, fill = "value", na.rm = TRUE)) + 
+      geom_bar(stat = "count") + 
+      labs(x = "Program Focus Areas", y = "Number of Programs", title = "APOST Programs' Focus Areas") +
+      theme(legend.position="none")
+  })
+  # Spark Plot
+  output$plot_height <- renderPlotly({
+    dat <- subset(mwInput(),  variable == "height")
     ggplot(data = dat, aes(x = name, y = as.numeric(value), fill = name)) + geom_bar(stat = "identity")
   })
-  # A plot showing the height of characters
+  # Benedum Plot
   output$plot_height <- renderPlotly({
     dat <- subset(mwInput(),  variable == "height")
     ggplot(data = dat, aes(x = name, y = as.numeric(value), fill = name)) + geom_bar(stat = "identity")
