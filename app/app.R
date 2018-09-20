@@ -25,46 +25,16 @@ mAPOST$variable <- NULL
 
 pdf(NULL)
 
-header <- dashboardHeader(title = "Remake Learning",
-                          dropdownMenu(type = "notifications",
-                                       notificationItem(text = "5 escape pods deployed", 
-                                                        icon = icon("users"))
-                          ),
-                          dropdownMenu(type = "tasks", badgeStatus = "success",
-                                       taskItem(value = 110, color = "green",
-                                                "Midichlorians")
-                          ),
-                          dropdownMenu(type = "messages",
-                                       messageItem(
-                                         from = "Princess Leia",
-                                         message = HTML("Help Me Obi-Wan Kenobi! <br> You're my only hope."),
-                                         icon = icon("exclamation-circle"))
-                          )
+header <- dashboardHeader(title = "Remake Learning"
 )
 
 sidebar <- dashboardSidebar(
   sidebarMenu(
     id = "tabs",
-    menuItem("APOSTplot", icon = icon("bar-chart"), tabName = "APOST"),
-    menuItem("Sparkplot", icon = icon("bar-chart"), tabName = "Spark Grants"),
-    menuItem("Benedumplot", icon = icon("bar-chart"), tabName = "Benedum Grants"),
+    menuItem("APOSTPlot", icon = icon("clock-o"), tabName = "APOST"),
+    menuItem("SparkPlot", icon = icon("money"), tabName = "Spark Grants"),
+    menuItem("BenedumPlot", icon = icon("money"), tabName = "Benedum Grants"),
 #    menuItem("Table", icon = icon("table"), tabName = "table", badgeLabel = "new", badgeColor = "green"),
-    #APOST Selection
-    selectInput("Orgselect",
-                "Organization:",
-                choices = sort(unique(mAPOST$Organization)),
-                multiple = TRUE,
-                selectize = TRUE,
-                selected = c("University of Pittsburgh", "Carnegie Science Center")),
-    #Spark Selection
-    sliderInput("SparkSelect",
-                "Grant Amount:",
-                min = min(Spark$Amt, na.rm = T),
-                max = max(Spark$Amt, na.rm = T),
-                value = c(min(Spark$Amt, na.rm = T), max(Spark$Amt, na.rm = T)),
-                step = 1)
-  )
-)               
     #Benedum Selection
       sliderInput("BenedumSelect",
                   "Grant Amount:",
@@ -76,47 +46,59 @@ sidebar <- dashboardSidebar(
 )
 
 body <- dashboardBody(tabItems(
-  tabItem("APOSTplot",
+  tabItem("APOSTPlot",
+          fluidRow(
+            box(#APOST Selection
+              selectInput("OrgSelect",
+                          "Organization:",
+                          choices = sort(unique(mAPOST$Organization)),
+                          multiple = TRUE,
+                          selectize = TRUE,
+                          selected = c("University of Pittsburgh", "Carnegie Science Center"))
+              ),
+            infoBoxOutput("mass"),
+            valueBoxOutput("height")
+          ),
+          fluidRow(
+            box(title = "idk what to put here",
+                   width = 12,
+                   plotlyOutput("plot_mass"))
+          )
+  ),
+ tabItem("SparkPlot",
+         fluidRow(
+           box(
+             sliderInput("SparkSelect",
+                         "Grant Amount:",
+                         min = min(Spark$Amt, na.rm = T),
+                         max = max(Spark$Amt, na.rm = T),
+                         value = c(min(Spark$Amt, na.rm = T), max(Spark$Amt, na.rm = T)),
+                         step = 1)
+           )
+         )  ),
+           infoBoxOutput("mass"),
+           valueBoxOutput("height"),
+         fluidRow(
+           box(title = "Plot",
+                  width = 12,
+                  plotlyOutput("plot_mass"))
+         )
+ ),
+  tabItem("BenedumPlot",
           fluidRow(
             infoBoxOutput("mass"),
             valueBoxOutput("height")
           ),
           fluidRow(
-            tabBox(title = "Plot",
+            box(title = "Plot",
                    width = 12,
-                   tabPanel("Mass", plotlyOutput("plot_mass")),
-                   tabPanel("Height", plotlyOutput("plot_height")))
+                   plotlyOutput("plot_mass"))
           )
   ),
-#  tabItem("plot",
-#          fluidRow(
-#            infoBoxOutput("mass"),
-#            valueBoxOutput("height")
-#          ),
-#          fluidRow(
-#            tabBox(title = "Plot",
-#                   width = 12,
-#                   tabPanel("Mass", plotlyOutput("plot_mass")),
-#                   tabPanel("Height", plotlyOutput("plot_height")))
-#          )
-#  ),
-#  tabItem("plot",
-#          fluidRow(
-#            infoBoxOutput("mass"),
-#            valueBoxOutput("height")
-#          ),
-#          fluidRow(
-#            tabBox(title = "Plot",
-#                   width = 12,
-#                   tabPanel("Mass", plotlyOutput("plot_mass")),
-#                   tabPanel("Height", plotlyOutput("plot_height")))
-#          )
-#  ),
   tabItem("table",
           fluidPage(
             box(title = "Selected Character Stats", DT::dataTableOutput("table"), width = 12))
   )
-)
 )
 
 ui <- dashboardPage(header, sidebar, body)
@@ -157,6 +139,7 @@ server <- function(input, output) {
   output$mass <- renderInfoBox({
     sw <- swInput()
     num <- round(mean(sw$mass, na.rm = T), 2)
+  #in here is where you put the sum of orgs 
     
     infoBox("Avg Mass", value = num, subtitle = paste(nrow(sw), "characters"), icon = icon("balance-scale"), color = "purple")
   })
