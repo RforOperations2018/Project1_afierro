@@ -53,7 +53,7 @@ body <- dashboardBody(tabItems(
           fluidRow(
             box(title = "idk what to put here",
                    width = 12,
-                   plotlyOutput("plot_mass"))
+                   plotlyOutput("APOSTPlot"))
           )
   ),
  tabItem("SparkPlot",
@@ -72,7 +72,7 @@ body <- dashboardBody(tabItems(
          fluidRow(
            box(title = "Plot",
                   width = 12,
-                  plotlyOutput("plot_mass"))
+                  plotlyOutput("SparkPlot"))
          )
  ),
   tabItem("BenedumPlot",
@@ -91,13 +91,13 @@ body <- dashboardBody(tabItems(
           fluidRow(
             box(title = "Plot",
                    width = 12,
-                   plotlyOutput("plot_mass"))
+                   plotlyOutput("BenedumPlot"))
           )
-  ),
-  tabItem("table",
-          fluidPage(
-            box(title = "Selected Character Stats", DT::dataTableOutput("table"), width = 12))
   )
+#  tabItem("table",
+#          fluidPage(
+#            box(title = "Selected Character Stats", DT::dataTableOutput("table"), width = 12))
+#  )
 )
 
 ui <- dashboardPage(header, sidebar, body)
@@ -121,7 +121,7 @@ server <- function(input, output) {
     return(mAPOST)
   })
   # APOST Plot
-  output$plot_mass <- renderPlotly({
+  output$APOSTPlot <- renderPlotly({
     mAPOSTInput() %>% 
       drop_na(value) %>%
       ggplot(aes(x = value, fill = "value", na.rm = TRUE)) + 
@@ -129,27 +129,46 @@ server <- function(input, output) {
       labs(x = "Program Focus Areas", y = "Number of Programs", title = "APOST Programs' Focus Areas") +
       theme(legend.position="none")
   })
+  
+  SparkInput <- reactive({
+    DF <- Spark %>%
+    # ORG Filter
+      filter(Amt >= input$SparkSelect[1] & Amt <= input$SparkSelect[2])
+    
+    
+    return(DF)
+  })
   # Spark Plot
-  output$plot_height <- renderPlotly({
-    dat <- subset(mwInput(),  variable == "height")
-    ggplot(data = dat, aes(x = name, y = as.numeric(value), fill = name)) + geom_bar(stat = "identity")
+  output$SparkPlot <- renderPlotly({
+    SparkplotInput() <- Spark %>% 
+      group_by(name) %>% 
+      summarise(Amt = sum(Amt))
+    ggplot(data = Sparkplot, aes(x = name, y = Amt)) +
+      geom_bar(stat = "identity", fill = "#663096") +
+      labs(x = "Grantee", y = "Total Amount Awarded", title = "Spark Grants") +
+      coord_flip() +
+      theme(legend.position="none")
   })
   # Benedum Plot
-  output$plot_height <- renderPlotly({
-    dat <- subset(mwInput(),  variable == "height")
-    ggplot(data = dat, aes(x = name, y = as.numeric(value), fill = name)) + geom_bar(stat = "identity")
+  output$BenedumPlot <- renderPlotly({
+    BendedumplotInput() <- Ben %>% 
+      group_by(Organization) %>% 
+      summarise(Amt = sum(Amt)) %>%
+      drop_na(Amt) %>%
+      ggplot(aes(x = Organization, y = Amt, fill = "Amt")) +
+      geom_bar(stat = "identity") +
+      labs(x = "Organization", y = "Total Amount Awarded", title = "Benedum Grants") +
+      coord_flip() +
+      theme(legend.position="none")
   })
   # Data table of characters
-  output$table <- DT::renderDataTable({
-    subset(swInput(), select = c(name, height, mass, birth_year, homeworld, species, films))
-  })
+#  output$table <- DT::renderDataTable({
+#    subset(swInput(), select = c(name, height, mass, birth_year, homeworld, species, films))
+#  })
   # Mass mean info box
-  output$mass <- renderInfoBox({
-    sw <- swInput()
-    num <- round(mean(sw$mass, na.rm = T), 2)
-  #in here is where you put the sum of orgs 
-    
-    infoBox("Avg Mass", value = num, subtitle = paste(nrow(sw), "characters"), icon = icon("balance-scale"), color = "purple")
+  output$orgnumber <- renderInfoBox({
+    orgtotal <- length(unique(APOST$Organization))
+    infoBox("Total Number of Orgs", value = num, subtitle = "fill this in", icon = icon("balance-scale"), color = "purple")
   })
   # Height mean value box
   output$height <- renderValueBox({
