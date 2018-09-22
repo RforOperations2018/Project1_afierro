@@ -72,6 +72,8 @@ server <- function(input, output) {
   mAPOSTInput <- reactive({
     mAPOST <- melt(APOSTInput(), id.vars = "Organization")
     mAPOST$variable <- NULL
+    
+    return(mAPOST)
   })
   # APOST Plot
   output$APOSTPlot <- renderPlotly({
