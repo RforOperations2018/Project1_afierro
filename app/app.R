@@ -25,17 +25,16 @@ mAPOST$variable <- NULL
 
 pdf(NULL)
 
-header <- dashboardHeader(title = "Remake Learning"
-)
+header <- dashboardHeader(title = "Remake Learning")
 
 sidebar <- dashboardSidebar(
   sidebarMenu(
     id = "tabs",
     menuItem("APOSTPlot", icon = icon("clock-o"), tabName = "APOST"),
     menuItem("SparkPlot", icon = icon("money"), tabName = "Spark Grants"),
-    menuItem("BenedumPlot", icon = icon("money"), tabName = "Benedum Grants")),
+    menuItem("BenedumPlot", icon = icon("money"), tabName = "Benedum Grants"))
 #    menuItem("Table", icon = icon("table"), tabName = "table", badgeLabel = "new", badgeColor = "green"),
-
+)
 body <- dashboardBody(tabItems(
   tabItem("APOSTPlot",
           fluidRow(
@@ -98,7 +97,6 @@ body <- dashboardBody(tabItems(
 #          fluidPage(
 #            box(title = "Selected Character Stats", DT::dataTableOutput("table"), width = 12))
   )
-)
 
 ui <- dashboardPage(header, sidebar, body)
 
@@ -107,8 +105,8 @@ server <- function(input, output) {
   APOSTInput <- reactive({
     DF <- APOST
     # ORG Filter
-    if (length(input$APOSTSelect) > 0 ) {
-      DF <- subset(DF, Organization %in% input$APOSTSelect)
+    if (length(input$OrgSelect) > 0 ) {
+      DF <- subset(DF, Organization %in% input$OrgSelect)
     }
     
     return(DF)
