@@ -48,13 +48,12 @@ body <- dashboardBody(tabItems(
 #              ),
 #            infoBoxOutput("mass"),
 #            valueBoxOutput("height")
-          ),
+          )),
           fluidRow(
             box(title = "idk what to put here",
                    width = 12,
                    plotlyOutput("APOSTPlot"))
-          )
-  ),
+          )),
  tabItem("SparkPlot",
          fluidRow(
            box(
@@ -71,7 +70,7 @@ body <- dashboardBody(tabItems(
          fluidRow(
            box(title = "say something about the plot",
                   width = 12,
-                  plotlyOutput("SparkPlot"))
+                  (plotlyOutput("SparkPlot"))
          )
  ),
   tabItem("BenedumPlot",
@@ -90,13 +89,13 @@ body <- dashboardBody(tabItems(
           fluidRow(
             box(title = "say something about the plot",
                    width = 12,
-                   plotlyOutput("BenedumPlot"))
+                   (plotlyOutput("BenedumPlot"))
           )
   )
+))
 #  tabItem("table",
 #          fluidPage(
 #            box(title = "Selected Character Stats", DT::dataTableOutput("table"), width = 12))
-  )
 
 ui <- dashboardPage(header, sidebar, body)
 
