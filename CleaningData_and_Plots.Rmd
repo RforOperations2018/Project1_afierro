@@ -45,16 +45,19 @@ ggplot(aes(x = value, fill = "value", na.rm = TRUE)) +
 
 ```{r}
 
-Spark %>% 
+Sparkplot <- Spark %>% 
   group_by(name) %>% 
   summarise(Amt = sum(Amt))
 
-  ggplot(data = Spark, aes(x = Name, y = Amt, fill = "Amt")) +
-           geom_bar(stat = "identity") +
+  ggplot(data = Sparkplot, aes(x = name, y = Amt)) +
+           geom_bar(stat = "identity", fill = "#663096") +
      labs(x = "Grantee", y = "Total Amount Awarded", title = "Spark Grants") +
       coord_flip() +
     theme(legend.position="none")
 ```
+
+
+
 ```{r}
 
 Ben %>% 

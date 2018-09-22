@@ -16,7 +16,7 @@ Ben$name <- as.factor(Ben$Organization)
 
 Spark <- read_excel("Spark.xlsx")
 colnames(Spark) <- c("Amt", "Name")
-Spark$name <- as.factor(Spark$Name)
+Spark$Name <- as.factor(Spark$Name)
 
 APOST <-read_excel("APOST.xls")
 
@@ -33,22 +33,22 @@ sidebar <- dashboardSidebar(
     id = "tabs",
     menuItem("APOSTPlot", icon = icon("clock-o"), tabName = "APOST"),
     menuItem("SparkPlot", icon = icon("money"), tabName = "Spark Grants"),
-    menuItem("BenedumPlot", icon = icon("money"), tabName = "Benedum Grants"),
+    menuItem("BenedumPlot", icon = icon("money"), tabName = "Benedum Grants")),
 #    menuItem("Table", icon = icon("table"), tabName = "table", badgeLabel = "new", badgeColor = "green"),
 
 body <- dashboardBody(tabItems(
   tabItem("APOSTPlot",
           fluidRow(
-            box(#APOST Selection
+            box(
               selectInput("OrgSelect",
                           "Organization:",
                           choices = sort(unique(mAPOST$Organization)),
                           multiple = TRUE,
                           selectize = TRUE,
                           selected = c("University of Pittsburgh", "Carnegie Science Center"))
-              ),
-            infoBoxOutput("mass"),
-            valueBoxOutput("height")
+#              ),
+#            infoBoxOutput("mass"),
+#            valueBoxOutput("height")
           ),
           fluidRow(
             box(title = "idk what to put here",
@@ -67,10 +67,10 @@ body <- dashboardBody(tabItems(
                          step = 1)
            )
          )  ),
-           infoBoxOutput("mass"),
-           valueBoxOutput("height"),
+#           infoBoxOutput("mass"),
+#           valueBoxOutput("height"),
          fluidRow(
-           box(title = "Plot",
+           box(title = "say something about the plot",
                   width = 12,
                   plotlyOutput("SparkPlot"))
          )
@@ -85,11 +85,11 @@ body <- dashboardBody(tabItems(
                                   step = 1)
             )
           )),
-            infoBoxOutput("mass"),
-            valueBoxOutput("height")
-          ),
+#            infoBoxOutput("mass"),
+#            valueBoxOutput("height")
+#          ),
           fluidRow(
-            box(title = "Plot",
+            box(title = "say something about the plot",
                    width = 12,
                    plotlyOutput("BenedumPlot"))
           )
@@ -97,7 +97,7 @@ body <- dashboardBody(tabItems(
 #  tabItem("table",
 #          fluidPage(
 #            box(title = "Selected Character Stats", DT::dataTableOutput("table"), width = 12))
-#  )
+  )
 )
 
 ui <- dashboardPage(header, sidebar, body)
@@ -166,17 +166,17 @@ server <- function(input, output) {
 #    subset(swInput(), select = c(name, height, mass, birth_year, homeworld, species, films))
 #  })
   # Mass mean info box
-  output$orgnumber <- renderInfoBox({
-    orgtotal <- length(unique(APOST$Organization))
-    infoBox("Total Number of Orgs", value = num, subtitle = "fill this in", icon = icon("balance-scale"), color = "purple")
-  })
+#  output$orgnumber <- renderInfoBox({
+#    orgtotal <- length(unique(APOST$Organization))
+#    infoBox("Total Number of Orgs", value = num, subtitle = "fill this in", icon = icon("balance-scale"), color = "purple")
+#  })
   # Height mean value box
-  output$height <- renderValueBox({
-    sw <- swInput()
-    num <- round(mean(sw$height, na.rm = T), 2)
+#  output$height <- renderValueBox({
+#    sw <- swInput()
+#    num <- round(mean(sw$height, na.rm = T), 2)
     
-    valueBox(subtitle = "Avg Height", value = num, icon = icon("sort-numeric-asc"), color = "green")
-  })
+#    valueBox(subtitle = "Avg Height", value = num, icon = icon("sort-numeric-asc"), color = "green")
+#  })
 }
 
 # Run the application 
