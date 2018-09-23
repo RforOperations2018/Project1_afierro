@@ -147,7 +147,7 @@ server <- function(input, output) {
   })
   # APOST Plot
   output$APOSTPlot <- renderPlotly({
-    dat <- mAPOSTInput()
+    dat <- mAPOST
       ggplot(data = dat, aes(x = value, fill = "value", na.rm = TRUE)) + 
       geom_bar(stat = "count") + 
       theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1)) +
@@ -156,11 +156,11 @@ server <- function(input, output) {
   })
   
   SparkInput <- reactive({
-    DF <- Spark %>%
+    Sparkreac <- Spark %>%
     # Amt Filter
       filter(Amt >= input$SparkSelect[1] & Amt <= input$SparkSelect[2])
 
-      return(DF)
+      return(Sparkreac)
   })
   # Spark Plot
   output$SparkPlot <- renderPlotly({
