@@ -24,6 +24,7 @@ mAPOST <- melt(APOST, id.vars = "Organization")
 mAPOST$variable <- NULL
 
 View(mAPOST)
+View(Spark)
 
 pdf(NULL)
 
@@ -39,7 +40,7 @@ sidebar <- dashboardSidebar(
 )
 body <- dashboardBody(tabItems(
   tabItem("APOST",
-          fluidRow(infoBox("Number of Organizations")
+          fluidRow(valueBox(length(unique(APOST$Organization)), "Number of Orgs", icon = icon("users"), color = "purple")
                    ),
           fluidRow(
             box(
@@ -59,6 +60,8 @@ body <- dashboardBody(tabItems(
     )
 ),
  tabItem("Spark Grants",
+         fluidRow(valueBox(length(unique(Spark$Name)), "Number of Grantees", icon = icon("users"), color = "red")
+         ),
          fluidRow(
            box(
              sliderInput("SparkSelect",
@@ -123,11 +126,6 @@ server <- function(input, output) {
       geom_bar(stat = "count") + 
       labs(x = "Program Focus Areas", y = "Number of Programs", title = "APOST Programs' Focus Areas") +
       theme(legend.position="none")
-  })
-  
-output$orgnumber <- renderInfoBox({
-  orgtotal <- length(unique(APOST$Organization))
-  infoBox("Total Number of Orgs", value = num, subtitle = "fill this in", icon = icon("balance-scale"), color = "purple")
   })
   
   SparkInput <- reactive({
