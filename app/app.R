@@ -142,15 +142,14 @@ server <- function(input, output) {
   })
   # Reactive melted data
   mAPOSTInput <- reactive({
-    mAPOST <- APOSTInput %>%
-      melt(id.vars = "Organization") %>%
-    mAPOSTInput$variable <- NULL
-    
+    APOSTInput() %>%
+      melt(id.vars = "Organization")
+      
     return(mAPOST)
   })
   # APOST Plot
   output$APOSTPlot <- renderPlotly({
-    dat <- mAPOST
+    dat <- APOSTInput ()
       ggplot(data = dat, aes(x = value, fill = "value", na.rm = TRUE)) + 
       geom_bar(stat = "count") + 
       theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1)) +
@@ -213,7 +212,7 @@ server <- function(input, output) {
   ) 
   #APOST Table
   output$table <- DT::renderDataTable({
-    DF
+    APOSTtable
   })
   }
 
