@@ -17,7 +17,6 @@ Ben1$name <- as.factor(Ben$Organization)
 omit.Ben <- Ben1[240:1048451, ]
 na.omit(omit.Ben)
 Ben <- drop_na(Ben1)
-View(Ben)
 
 Spark <- read_excel("Spark.xlsx")
 colnames(Spark) <- c("Amt", "Name")
@@ -25,8 +24,9 @@ Spark$Name <- as.factor(Spark$Name)
 
 APOST <-read_excel("APOST.xls")
 
-mAPOST <- melt(APOST, id.vars = "Organization")
-mAPOST$variable <- NULL
+mAPOST.1 <- melt(APOST, id.vars = "Organization")
+mAPOST.1$variable <- NULL
+mAPOST <- drop_na(mAPOST.1)
 
 APOSTtable <- read_excel("APOSTtable.xls")
 
@@ -144,9 +144,8 @@ server <- function(input, output) {
   })
   # APOST Plot
   output$APOSTPlot <- renderPlotly({
-    dat <- mAPOST %>% 
-      drop_na(value) %>%
-      ggplot(aes(data = dat, x = value, fill = "value", na.rm = TRUE)) + 
+    dat <- mAPOST
+      ggplot(data = dat, aes(x = value, fill = "value", na.rm = TRUE)) + 
       geom_bar(stat = "count") + 
       labs(x = "Program Focus Areas", y = "Number of Programs", title = "APOST Programs' Focus Areas") +
       theme(legend.position="none")
