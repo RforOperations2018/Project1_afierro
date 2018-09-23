@@ -114,12 +114,9 @@ server <- function(input, output) {
   })
   # APOST Plot
   output$APOSTPlot <- renderPlotly({
-    mAPOSTInput() %>% 
-      drop_na(value) %>%
-      ggplot(aes(x = value, fill = "value", na.rm = TRUE)) + 
-      geom_bar(stat = "count") + 
-      labs(x = "Program Focus Areas", y = "Number of Programs", title = "APOST Programs' Focus Areas") +
-      theme(legend.position="none")
+    dat <- mAPOSTInput()
+      ggplot(data = dat, aes(x = value)) + 
+      geom_bar()
   })
   
   SparkInput <- reactive({
