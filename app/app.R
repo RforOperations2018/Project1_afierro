@@ -36,7 +36,7 @@ sidebar <- dashboardSidebar(
 #    menuItem("Table", icon = icon("table"), tabName = "table", badgeLabel = "new", badgeColor = "green"),
 )
 body <- dashboardBody(tabItems(
-  tabItem("APOSTPlot",
+  tabItem("APOST",
           fluidRow(
             box(
               selectInput("OrgSelect",
@@ -48,13 +48,15 @@ body <- dashboardBody(tabItems(
 #              ),
 #            infoBoxOutput("mass"),
 #            valueBoxOutput("height")
-          )),
+          ),
           fluidRow(
             box(title = "idk what to put here",
                    width = 12,
                    plotlyOutput("APOSTPlot"))
-          )),
- tabItem("SparkPlot",
+          )
+        )
+),
+ tabItem("Spark Grants",
          fluidRow(
            box(
              sliderInput("SparkSelect",
@@ -64,7 +66,7 @@ body <- dashboardBody(tabItems(
                          value = c(min(Spark$Amt, na.rm = T), max(Spark$Amt, na.rm = T)),
                          step = 1)
            )
-         )  ),
+         ),
 #           infoBoxOutput("mass"),
 #           valueBoxOutput("height"),
          fluidRow(
@@ -72,8 +74,9 @@ body <- dashboardBody(tabItems(
                   width = 12,
                   (plotlyOutput("SparkPlot"))
          )
+       )
  ),
-  tabItem("BenedumPlot",
+  tabItem("Benedum Grants",
           fluidRow(
             box(sliderInput("BenedumSelect",
                             "Grant Amount:",
@@ -82,20 +85,19 @@ body <- dashboardBody(tabItems(
                             value = c(min(Ben$Amt, na.rm = T), max(Ben$Amt, na.rm = T)),
                                   step = 1)
             )
-          )),
-#            infoBoxOutput("mass"),
-#            valueBoxOutput("height")
-#          ),
+          ),
           fluidRow(
             box(title = "say something about the plot",
                    width = 12,
                    (plotlyOutput("BenedumPlot"))
           )
-  )
-))
+      )
+    )
+  )#,
 #  tabItem("table",
 #          fluidPage(
 #            box(title = "Selected Character Stats", DT::dataTableOutput("table"), width = 12))
+)
 
 ui <- dashboardPage(header, sidebar, body)
 
