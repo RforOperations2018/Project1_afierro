@@ -39,12 +39,12 @@ body <- dashboardBody(tabItems(
   tabItem("APOST",
           fluidRow(
             box(
-              selectInput("OrgSelect",
-                          "Organization:",
-                          choices = sort(unique(mAPOST$Organization)),
+              selectInput("FocusSelect",
+                          "Focus Area:",
+                          choices = sort(unique(mAPOST$value)),
                           multiple = TRUE,
                           selectize = TRUE,
-                          selected = c("University of Pittsburgh", "Carnegie Science Center"))
+                          selected = c("STEM", "Arts & Culture"))
 #              ),
 #            infoBoxOutput("mass"),
 #            valueBoxOutput("height")
@@ -93,7 +93,7 @@ body <- dashboardBody(tabItems(
           )
       )
     )
-  )#,
+  )
 #  tabItem("table",
 #          fluidPage(
 #            box(title = "Selected Character Stats", DT::dataTableOutput("table"), width = 12))
@@ -106,15 +106,15 @@ server <- function(input, output) {
   APOSTInput <- reactive({
     DF <- APOST
     # ORG Filter
-    if (length(input$OrgSelect) > 0 ) {
-      DF <- subset(DF, Organization %in% input$OrgSelect)
+    if (length(input$FocusSelect) > 0 ) {
+      DF <- subset(DF, value %in% input$FocusSelect)
     }
     
     return(DF)
   })
   # Reactive melted data
   mAPOSTInput <- reactive({
-    mAPOST <- melt(APOSTInput(), id.vars = "Organization")
+    mAPOST <- melt(APOSTInput(), id.vars = "value")
     mAPOST$variable <- NULL
     
     return(mAPOST)
@@ -150,7 +150,7 @@ server <- function(input, output) {
   })
   # Benedum Plot
   output$BenedumPlot <- renderPlotly({
-    BendedumplotInput() <- Ben %>% 
+    BendedumplotInput() %>% 
       group_by(Organization) %>% 
       summarise(Amt = sum(Amt)) %>%
       drop_na(Amt) %>%
