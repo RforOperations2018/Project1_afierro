@@ -23,6 +23,8 @@ APOST <-read_excel("APOST.xls")
 mAPOST <- melt(APOST, id.vars = "Organization")
 mAPOST$variable <- NULL
 
+View(mAPOST)
+
 pdf(NULL)
 
 header <- dashboardHeader(title = "Remake Learning")
@@ -33,7 +35,6 @@ sidebar <- dashboardSidebar(
     menuItem("APOSTPlot", icon = icon("clock-o"), tabName = "APOST"),
     menuItem("SparkPlot", icon = icon("money"), tabName = "Spark Grants"),
     menuItem("BenedumPlot", icon = icon("money"), tabName = "Benedum Grants"))
-#    menuItem("Table", icon = icon("table"), tabName = "table", badgeLabel = "new", badgeColor = "green"),
 )
 body <- dashboardBody(tabItems(
   tabItem("APOST",
@@ -45,12 +46,9 @@ body <- dashboardBody(tabItems(
                           multiple = TRUE,
                           selectize = TRUE,
                           selected = c("STEM", "Arts & Culture"))
-#              ),
-#            infoBoxOutput("mass"),
-#            valueBoxOutput("height")
           ),
           fluidRow(
-            box(title = "idk what to put here",
+            box(title = "Focus Areas of After School Programs in Pittsburgh",
                    width = 12,
                    plotlyOutput("APOSTPlot"))
           )
@@ -64,11 +62,9 @@ body <- dashboardBody(tabItems(
                          min = min(Spark$Amt, na.rm = T),
                          max = max(Spark$Amt, na.rm = T),
                          value = c(min(Spark$Amt, na.rm = T), max(Spark$Amt, na.rm = T)),
-                         step = 1)
+                         step = 1,000)
            )
          ),
-#           infoBoxOutput("mass"),
-#           valueBoxOutput("height"),
          fluidRow(
            box(title = "say something about the plot",
                   width = 12,
@@ -83,7 +79,7 @@ body <- dashboardBody(tabItems(
                             min = min(Ben$Amt, na.rm = T),
                             max = max(Ben$Amt, na.rm = T),
                             value = c(min(Ben$Amt, na.rm = T), max(Ben$Amt, na.rm = T)),
-                                  step = 1)
+                                  step = 10,000)
             )
           ),
           fluidRow(
@@ -94,9 +90,6 @@ body <- dashboardBody(tabItems(
       )
     )
   )
-#  tabItem("table",
-#          fluidPage(
-#            box(title = "Selected Character Stats", DT::dataTableOutput("table"), width = 12))
 )
 
 ui <- dashboardPage(header, sidebar, body)
@@ -114,7 +107,7 @@ server <- function(input, output) {
   })
   # Reactive melted data
   mAPOSTInput <- reactive({
-    mAPOST <- melt(APOSTInput(), id.vars = "value")
+    mAPOST <- melt(APOSTInput(), id.vars = "Organization")
     mAPOST$variable <- NULL
     
     return(mAPOST)
@@ -133,9 +126,8 @@ server <- function(input, output) {
     DF <- Spark %>%
     # ORG Filter
       filter(Amt >= input$SparkSelect[1] & Amt <= input$SparkSelect[2])
-    
-    
-    return(DF)
+
+      return(DF)
   })
   # Spark Plot
   output$SparkPlot <- renderPlotly({
@@ -160,22 +152,7 @@ server <- function(input, output) {
       coord_flip() +
       theme(legend.position="none")
   })
-  # Data table of characters
-#  output$table <- DT::renderDataTable({
-#    subset(swInput(), select = c(name, height, mass, birth_year, homeworld, species, films))
-#  })
-  # Mass mean info box
-#  output$orgnumber <- renderInfoBox({
-#    orgtotal <- length(unique(APOST$Organization))
-#    infoBox("Total Number of Orgs", value = num, subtitle = "fill this in", icon = icon("balance-scale"), color = "purple")
-#  })
-  # Height mean value box
-#  output$height <- renderValueBox({
-#    sw <- swInput()
-#    num <- round(mean(sw$height, na.rm = T), 2)
-    
-#    valueBox(subtitle = "Avg Height", value = num, icon = icon("sort-numeric-asc"), color = "green")
-#  })
+
 }
 
 # Run the application 

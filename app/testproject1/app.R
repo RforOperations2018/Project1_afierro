@@ -35,35 +35,32 @@ sidebar <- dashboardSidebar(
     menuItem("BenedumPlot", icon = icon("money"), tabName = "Benedum Grants"))
   #    menuItem("Table", icon = icon("table"), tabName = "table", badgeLabel = "new", badgeColor = "green"),
 )
-body <- dashboardBody(
-  tabItems(
-    tabItem("APOSTPlot",
-            fluidRow(
-              box(
-                selectInput("OrgSelect",
-                            "Organization:",
-                            choices = sort(unique(mAPOST$Organization)),
-                            multiple = TRUE,
-                            selectize = TRUE,
-                            selected = c("University of Pittsburgh", "Carnegie Science Center"))
-              )),
-            fluidRow(
-              box(title = "idk what to put here",
-                  width = 12,
-                  plotlyOutput("APOSTPlot"))
-            ))
+body <- dashboardBody(tabItems(
+  tabItem("APOST",
+          fluidRow(
+            selectInput("FocusSelect",
+                        "Focus Area:",
+                        choices = sort(unique(mAPOST$value)),
+                        multiple = TRUE,
+                        selectize = TRUE,
+                        selected = c("STEM", "Arts & Culture"))
+          )
+          ),
+          fluidRow(title = "Focus Areas of After School Programs in Pittsburgh",
+                         width = 12, 
+                         plotlyOutput("APOSTPlot")
+              
             )
     )
-
+)
 ui <- dashboardPage(header, sidebar, body)
-
-# 
+# Define server logic
 server <- function(input, output) {
   APOSTInput <- reactive({
     DF <- APOST
     # ORG Filter
-    if (length(input$OrgSelect) > 0 ) {
-      DF <- subset(DF, Organization %in% input$OrgSelect)
+    if (length(input$FocusSelect) > 0 ) {
+      DF <- subset(DF, value %in% input$FocusSelect)
     }
     
     return(DF)
@@ -77,14 +74,40 @@ server <- function(input, output) {
   })
   # APOST Plot
   output$APOSTPlot <- renderPlotly({
-    dat <- mAPOSTInput()
-      ggplot(data = dat, aes(x = value, fill = "value", na.rm = TRUE)) + 
+    mAPOSTInput() %>% 
+      drop_na(value) %>%
+      ggplot(aes(x = value, fill = "value", na.rm = TRUE)) + 
       geom_bar(stat = "count") + 
       labs(x = "Program Focus Areas", y = "Number of Programs", title = "APOST Programs' Focus Areas") +
       theme(legend.position="none")
   })
 }
-
 # Run the application 
 shinyApp(ui = ui, server = server)
 
+#    menuItem("Table", icon = icon("table"), tabName = "table", badgeLabel = "new", badgeColor = "green"),
+
+
+#  tabItem("table",
+#          fluidPage(
+#            box(title = "Selected Character Stats", DT::dataTableOutput("table"), width = 12))
+
+
+
+
+# Data table of characters
+#  output$table <- DT::renderDataTable({
+#    subset(swInput(), select = c(name, height, mass, birth_year, homeworld, species, films))
+#  })
+# Mass mean info box
+#  output$orgnumber <- renderInfoBox({
+#    orgtotal <- length(unique(APOST$Organization))
+#    infoBox("Total Number of Orgs", value = num, subtitle = "fill this in", icon = icon("balance-scale"), color = "purple")
+#  })
+# Height mean value box
+#  output$height <- renderValueBox({
+#    sw <- swInput()
+#    num <- round(mean(sw$height, na.rm = T), 2)
+
+#    valueBox(subtitle = "Avg Height", value = num, icon = icon("sort-numeric-asc"), color = "green")
+#  })
