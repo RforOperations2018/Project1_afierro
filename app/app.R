@@ -141,9 +141,9 @@ server <- function(input, output) {
   })
   # APOST Plot
   output$APOSTPlot <- renderPlotly({
-    mAPOSTInput() %>% 
+    dat <- mAPOST %>% 
       drop_na(value) %>%
-      ggplot(aes(x = value, fill = "value", na.rm = TRUE)) + 
+      ggplot(aes(data = dat, x = value, fill = "value", na.rm = TRUE)) + 
       geom_bar(stat = "count") + 
       labs(x = "Program Focus Areas", y = "Number of Programs", title = "APOST Programs' Focus Areas") +
       theme(legend.position="none")
@@ -158,10 +158,10 @@ server <- function(input, output) {
   })
   # Spark Plot
   output$SparkPlot <- renderPlotly({
-    SparkInput() %>% 
-      group_by(name) %>% 
+    dat <- Spark%>% 
+      group_by(Name) %>% 
       summarise(Amt = sum(Amt))
-    ggplot(aes(x = name, y = Amt)) +
+    ggplot(data = dat, aes(x = Name, y = Amt)) +
       geom_bar(stat = "identity", fill = "#663096") +
       labs(x = "Grantee", y = "Total Amount Awarded", title = "Spark Grants") +
       coord_flip() +
@@ -177,11 +177,8 @@ server <- function(input, output) {
   })
   # Benedum Plot
   output$BenedumPlot <- renderPlotly({
-    BenInput() %>% 
-      group_by(Organization) %>% 
-      summarise(Amt = sum(Amt)) %>%
-      drop_na(Amt)
-      ggplot(aes(x = Organization, y = Amt, fill = "Amt")) +
+    dat <- Ben
+      ggplot(data = dat, aes(x = name, y = Amt, fill = "Amt")) +
       geom_bar(stat = "identity") +
       labs(x = "Organization", y = "Total Amount Awarded", title = "Benedum Grants") +
       coord_flip() +
