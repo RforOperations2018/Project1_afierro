@@ -128,13 +128,13 @@ ui <- dashboardPage(header, sidebar, body)
 # Define server logic
 server <- function(input, output) {
   APOSTInput <- reactive({
-    DF <- APOST %>%
+    APOSTreac <- APOST %>%
     # ORG Filter
     if (length(input$FocusSelect) > 0 ) {
-      DF <- subset(DF, value %in% input$FocusSelect)
+      APOSTreac <- subset(APOSTreac, value %in% input$FocusSelect)
     }
     
-    return(DF)
+    return(APOSTreac)
   })
   
   observeEvent(input$reset, {
@@ -143,13 +143,11 @@ server <- function(input, output) {
   # Reactive melted data
   mAPOSTInput <- reactive({
     APOSTInput() %>%
-      melt(id.vars = "Organization")
-      
-    return(mAPOST)
+      melt(id = "Organization")
   })
   # APOST Plot
   output$APOSTPlot <- renderPlotly({
-    dat <- APOSTInput ()
+    dat <- mAPOSTInput()
       ggplot(data = dat, aes(x = value, fill = "value", na.rm = TRUE)) + 
       geom_bar(stat = "count") + 
       theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1)) +
