@@ -139,10 +139,10 @@ server <- function(input, output) {
   })
   # Spark Plot
   output$SparkPlot <- renderPlotly({
-    SparkplotInput() <- Spark %>% 
+    SparkplotInput() %>% 
       group_by(name) %>% 
       summarise(Amt = sum(Amt))
-    ggplot(data = Sparkplot, aes(x = name, y = Amt)) +
+    ggplot(aes(x = name, y = Amt)) +
       geom_bar(stat = "identity", fill = "#663096") +
       labs(x = "Grantee", y = "Total Amount Awarded", title = "Spark Grants") +
       coord_flip() +
