@@ -206,8 +206,8 @@ server <- function(input, output) {
     }
   ) 
   #APOST Table
-  table <- DT::renderDataTable({
-    APOSTTableInput
+  output$table <- DT::renderDataTable({
+    APOSTtable
   })
 
 }
