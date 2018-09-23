@@ -38,8 +38,8 @@ sidebar <- dashboardSidebar(
   sidebarMenu(
     id = "tabs",
     menuItem("APOST Plot", tabName = "APOST", icon = icon("bar-chart")),
-    menuItem("Spark Plot", tabName = "Spark Grants", icon = icon("money")),
-    menuItem("Benedum Plot", tabName = "Benedum Grants", icon = icon("money")),
+    menuItem("Spark Grants Plot", tabName = "Spark Grants", icon = icon("money")),
+    menuItem("Benedum Grants Plot", tabName = "Benedum Grants", icon = icon("money")),
     menuItem("APOST Table", tabName = "APOST Pittsburgh", icon = icon("clock-o")))
 
 )
@@ -136,16 +136,21 @@ server <- function(input, output) {
     
     return(DF)
   })
+  
+  observeEvent(input$reset, {
+    updateSelectInput(session, "FocusSelect", selected = c("University of Pittsburgh", "Carnegie Science Center"))
+  })
   # Reactive melted data
   mAPOSTInput <- reactive({
-    melt(APOSTInput(), id.vars = "Organization")
+    mAPOST <- APOSTInput %>%
+      melt(id.vars = "Organization") %>%
     mAPOSTInput$variable <- NULL
     
     return(mAPOST)
   })
   # APOST Plot
   output$APOSTPlot <- renderPlotly({
-    dat <- mAPOSTInput
+    dat <- mAPOST
       ggplot(data = dat, aes(x = value, fill = "value", na.rm = TRUE)) + 
       geom_bar(stat = "count") + 
       theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1)) +
@@ -162,7 +167,7 @@ server <- function(input, output) {
   })
   # Spark Plot
   output$SparkPlot <- renderPlotly({
-    dat <- Spark%>% 
+    dat <- Spark %>%
       group_by(Name) %>% 
       summarise(Amt = sum(Amt))
     ggplot(data = dat, aes(x = Name, y = Amt)) +
@@ -208,10 +213,9 @@ server <- function(input, output) {
   ) 
   #APOST Table
   output$table <- DT::renderDataTable({
-    APOSTtable
+    DF
   })
-
-}
+  }
 
 # Run the application 
 shinyApp(ui = ui, server = server)
