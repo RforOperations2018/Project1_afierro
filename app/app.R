@@ -39,6 +39,8 @@ sidebar <- dashboardSidebar(
 )
 body <- dashboardBody(tabItems(
   tabItem("APOST",
+          fluidRow(infoBox("Number of Organizations")
+                   ),
           fluidRow(
             box(
               selectInput("FocusSelect",
@@ -121,6 +123,11 @@ server <- function(input, output) {
       geom_bar(stat = "count") + 
       labs(x = "Program Focus Areas", y = "Number of Programs", title = "APOST Programs' Focus Areas") +
       theme(legend.position="none")
+  })
+  
+output$orgnumber <- renderInfoBox({
+  orgtotal <- length(unique(APOST$Organization))
+  infoBox("Total Number of Orgs", value = num, subtitle = "fill this in", icon = icon("balance-scale"), color = "purple")
   })
   
   SparkInput <- reactive({
