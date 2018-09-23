@@ -58,8 +58,7 @@ body <- dashboardBody(tabItems(
                    width = 12,
                    plotlyOutput("APOSTPlot")
           )
-    )
-),
+    ),
  tabItem("Spark Grants",
          fluidRow(valueBox(length(unique(Spark$Name)), "Number of Grantees", icon = icon("users"), color = "red")
          ),
@@ -99,7 +98,7 @@ body <- dashboardBody(tabItems(
           )
       )
     )
-  )
+  ))
 )
 ui <- dashboardPage(header, sidebar, body)
 
