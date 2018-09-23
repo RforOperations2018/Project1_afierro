@@ -63,7 +63,8 @@ body <- dashboardBody(tabItems(
                    width = 12,
                    plotlyOutput("APOSTPlot")
           )
-    ),
+    )
+  ),
  tabItem("Spark Grants",
          fluidRow(valueBox(length(unique(Spark$Name)), "Number of Grantees", icon = icon("users"), color = "red")
          ),
@@ -77,7 +78,7 @@ body <- dashboardBody(tabItems(
                          step = 1,000)
            )
          ),
-         fluidRow(
+         fluidPage(
            box(title = "Spark Grantees and Amounts",
                   width = 12,
                   (plotlyOutput("SparkPlot"))
@@ -96,13 +97,13 @@ body <- dashboardBody(tabItems(
                                   step = 10,000)
             )
           ),
-          fluidRow(
+          fluidPage(
             box(title = "Benedum Grantees and Amounts",
                    width = 12,
                    (plotlyOutput("BenedumPlot"))
           )
       )
-    ),
+),
  tabItem("APOST Pittsburgh",
            fluidRow(
              box(selectInput("OrgSelect",
@@ -120,8 +121,7 @@ body <- dashboardBody(tabItems(
              box(DT::dataTableOutput("table")
                  
              ))
-           )
-         )
+)
   ))
 ui <- dashboardPage(header, sidebar, body)
 
