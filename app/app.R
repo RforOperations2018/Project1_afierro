@@ -27,10 +27,6 @@ mAPOST$variable <- NULL
 
 APOSTtable <- read_excel("APOSTtable.xls")
 
-View(mAPOST)
-View(Spark)
-View(Ben)
-
 pdf(NULL)
 
 header <- dashboardHeader(title = "Remake Learning")
@@ -38,10 +34,10 @@ header <- dashboardHeader(title = "Remake Learning")
 sidebar <- dashboardSidebar(
   sidebarMenu(
     id = "tabs",
-    menuItem("APOSTPlot", tabName = "APOST", icon = icon("bar-chart")),
-    menuItem("SparkPlot", tabName = "Spark Grants", icon = icon("money")),
-    menuItem("BenedumPlot", tabName = "Benedum Grants", icon = icon("money")),
-    menuItem("APOSTTable", tabName = "APOST Pittsburgh", icon = icon("clock-o")))
+    menuItem("APOST Plot", tabName = "APOST", icon = icon("bar-chart")),
+    menuItem("Spark Plot", tabName = "Spark Grants", icon = icon("money")),
+    menuItem("Benedum Plot", tabName = "Benedum Grants", icon = icon("money")),
+    menuItem("APOST Table", tabName = "APOST Pittsburgh", icon = icon("clock-o")))
 
 )
 body <- dashboardBody(tabItems(
@@ -104,10 +100,6 @@ body <- dashboardBody(tabItems(
       )
     ),
  tabItem("APOST Pittsburgh",
-         fluidRow(
-           box(inputPanel(
-             downloadButton("downloadData","Download APOST Data")
-           ))),
            fluidRow(
              box(selectInput("OrgSelect",
                              "Organization:",
@@ -116,8 +108,13 @@ body <- dashboardBody(tabItems(
                              selectize = TRUE,
                              selected = c("University of Pittsburgh", "Carnegie Science Center"))
              )),
+         fluidRow(
+           box(inputPanel(
+             downloadButton("downloadData","Download APOST Data")
+           ))),
            fluidPage(
              box(DT::dataTableOutput("table")
+                 
              ))
            )
          )
@@ -184,7 +181,7 @@ server <- function(input, output) {
   })
   #Table Filter
   APOSTTableInput <- reactive({
-    DF <- APOST
+    DF <- APOSTtable
     # ORG Filter
     if (length(input$OrgSelect) > 0 ) {
       DF <- subset(DF, Organization %in% input$OrgSelect)
@@ -192,9 +189,17 @@ server <- function(input, output) {
     
     return(DF)
   })
+  output$downloadData <- downloadHandler(
+    filename = function() {
+      paste(input$APOSTtable, Sys.Date(), ".csv", sep="")
+    },
+    content = function(file) {
+      write.csv(APOSTTbleInput(), file)
+    }
+  ) 
   #APOST Table
   table <- DT::renderDataTable({
-    APOSTtable
+    APOSTTableInput
   })
 
 }
