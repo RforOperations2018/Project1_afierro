@@ -48,13 +48,13 @@ body <- dashboardBody(tabItems(
                           selectize = TRUE,
                           selected = c("STEM", "Arts & Culture"))
           )
-),
-         fluidRow(
+  ),
+          fluidRow(
             box(title = "Focus Areas of After School Programs in Pittsburgh",
                    width = 12,
                    plotlyOutput("APOSTPlot")
           )
-)
+    )
 ),
  tabItem("Spark Grants",
          fluidRow(
@@ -68,7 +68,7 @@ body <- dashboardBody(tabItems(
            )
          ),
          fluidRow(
-           box(title = "say something about the plot",
+           box(title = "Spark Grantees and Amounts",
                   width = 12,
                   (plotlyOutput("SparkPlot"))
          )
@@ -85,13 +85,13 @@ body <- dashboardBody(tabItems(
             )
           ),
           fluidRow(
-            box(title = "say something about the plot",
+            box(title = "Benedum Grantees and Amounts",
                    width = 12,
                    (plotlyOutput("BenedumPlot"))
           )
       )
     )
-)
+  )
 )
 ui <- dashboardPage(header, sidebar, body)
 
