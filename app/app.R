@@ -35,6 +35,7 @@ sidebar <- dashboardSidebar(
     menuItem("APOSTPlot", icon = icon("clock-o"), tabName = "APOST"),
     menuItem("SparkPlot", icon = icon("money"), tabName = "Spark Grants"),
     menuItem("BenedumPlot", icon = icon("money"), tabName = "Benedum Grants"))
+
 )
 body <- dashboardBody(tabItems(
   tabItem("APOST",
@@ -46,13 +47,13 @@ body <- dashboardBody(tabItems(
                           multiple = TRUE,
                           selectize = TRUE,
                           selected = c("STEM", "Arts & Culture"))
-          ),
+          )
+),
           fluidRow(
             box(title = "Focus Areas of After School Programs in Pittsburgh",
                    width = 12,
-                   plotlyOutput("APOSTPlot"))
+                   plotlyOutput("APOSTPlot")
           )
-        )
 ),
  tabItem("Spark Grants",
          fluidRow(
@@ -91,7 +92,7 @@ body <- dashboardBody(tabItems(
     )
   )
 )
-
+)
 ui <- dashboardPage(header, sidebar, body)
 
 # Define server logic
@@ -114,9 +115,12 @@ server <- function(input, output) {
   })
   # APOST Plot
   output$APOSTPlot <- renderPlotly({
-    dat <- mAPOSTInput()
-      ggplot(data = dat, aes(x = value)) + 
-      geom_bar()
+    mAPOSTInput() %>% 
+      drop_na(value) %>%
+      ggplot(aes(x = value, fill = "value", na.rm = TRUE)) + 
+      geom_bar(stat = "count") + 
+      labs(x = "Program Focus Areas", y = "Number of Programs", title = "APOST Programs' Focus Areas") +
+      theme(legend.position="none")
   })
   
   SparkInput <- reactive({
