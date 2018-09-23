@@ -25,6 +25,8 @@ APOST <-read_excel("APOST.xls")
 mAPOST <- melt(APOST, id.vars = "Organization")
 mAPOST$variable <- NULL
 
+APOSTtable <- read_excel("APOSTtable.xls")
+
 View(mAPOST)
 View(Spark)
 View(Ben)
@@ -36,9 +38,10 @@ header <- dashboardHeader(title = "Remake Learning")
 sidebar <- dashboardSidebar(
   sidebarMenu(
     id = "tabs",
-    menuItem("APOSTPlot", tabName = "APOST", icon = icon("clock-o")),
+    menuItem("APOSTPlot", tabName = "APOST", icon = icon("bar-chart")),
     menuItem("SparkPlot", tabName = "Spark Grants", icon = icon("money")),
-    menuItem("BenedumPlot", tabName = "Benedum Grants", icon = icon("money")))
+    menuItem("BenedumPlot", tabName = "Benedum Grants", icon = icon("money")),
+    menuItem("APOSTTable", tabName = "APOST Pittsburgh", icon = icon("clock-o")))
 
 )
 body <- dashboardBody(tabItems(
@@ -99,9 +102,26 @@ body <- dashboardBody(tabItems(
                    (plotlyOutput("BenedumPlot"))
           )
       )
-    )
+    ),
+ tabItem("APOST Pittsburgh",
+         fluidRow(
+           box(inputPanel(
+             downloadButton("downloadData","Download APOST Data")
+           ))),
+           fluidRow(
+             box(selectInput("OrgSelect",
+                             "Organization:",
+                             choices = sort(unique(APOSTtable$Organization)),
+                             multiple = TRUE,
+                             selectize = TRUE,
+                             selected = c("University of Pittsburgh", "Carnegie Science Center"))
+             )),
+           fluidPage(
+             box(DT::dataTableOutput("table")
+             ))
+           )
+         )
   ))
-)
 ui <- dashboardPage(header, sidebar, body)
 
 # Define server logic
@@ -161,6 +181,20 @@ server <- function(input, output) {
       labs(x = "Organization", y = "Total Amount Awarded", title = "Benedum Grants") +
       coord_flip() +
       theme(legend.position="none")
+  })
+  #Table Filter
+  APOSTTableInput <- reactive({
+    DF <- APOST
+    # ORG Filter
+    if (length(input$OrgSelect) > 0 ) {
+      DF <- subset(DF, Organization %in% input$OrgSelect)
+    }
+    
+    return(DF)
+  })
+  #APOST Table
+  table <- DT::renderDataTable({
+    APOSTtable
   })
 
 }
