@@ -13,6 +13,8 @@ library(tidyverse)
 Ben <- read_excel("Benedum.xlsx")
 colnames(Ben) <- c("Area", "Organization", "Amt")
 Ben$name <- as.factor(Ben$Organization)
+omit.Ben <- Ben[240:1048451, ]
+na.omit(omit.Ben)
 
 Spark <- read_excel("Spark.xlsx")
 colnames(Spark) <- c("Amt", "Name")
