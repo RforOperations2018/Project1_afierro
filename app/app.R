@@ -147,6 +147,7 @@ server <- function(input, output) {
     dat <- mAPOST
       ggplot(data = dat, aes(x = value, fill = "value", na.rm = TRUE)) + 
       geom_bar(stat = "count") + 
+      theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1)) +
       labs(x = "Program Focus Areas", y = "Number of Programs", title = "APOST Programs' Focus Areas") +
       theme(legend.position="none")
   })
@@ -182,7 +183,7 @@ server <- function(input, output) {
     dat <- Ben
       ggplot(data = dat, aes(x = name, y = Amt, fill = "Amt")) +
       geom_bar(stat = "identity") +
-      labs(x = "Organization", y = "Total Amount Awarded", title = "Benedum Grants") +
+      labs(x = "Grantee", y = "Total Amount Awarded", title = "Benedum Grants") +
       coord_flip() +
       theme(legend.position="none")
   })
