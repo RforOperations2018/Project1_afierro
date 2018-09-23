@@ -32,9 +32,9 @@ header <- dashboardHeader(title = "Remake Learning")
 sidebar <- dashboardSidebar(
   sidebarMenu(
     id = "tabs",
-    menuItem("APOSTPlot", icon = icon("clock-o"), tabName = "APOST"),
-    menuItem("SparkPlot", icon = icon("money"), tabName = "Spark Grants"),
-    menuItem("BenedumPlot", icon = icon("money"), tabName = "Benedum Grants"))
+    menuItem("APOSTPlot", tabName = "APOST", icon = icon("clock-o")),
+    menuItem("SparkPlot", tabName = "Spark Grants", icon = icon("money")),
+    menuItem("BenedumPlot", tabName = "Benedum Grants", icon = icon("money")))
 
 )
 body <- dashboardBody(tabItems(

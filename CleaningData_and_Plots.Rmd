@@ -51,11 +51,11 @@ ggplot(data = mAPOST, aes(x = value)) + geom_bar()
 
 ```{r}
 
-Sparkplot <- Spark %>% 
+Spark %>% 
   group_by(Name) %>% 
   summarise(Amt = sum(Amt))
 
-  ggplot(data = Sparkplot, aes(x = Name, y = Amt)) +
+  ggplot(data = Spark, aes(x = Name, y = Amt)) +
            geom_bar(stat = "identity", fill = "#663096") +
      labs(x = "Grantee", y = "Total Amount Awarded", title = "Spark Grants") +
       coord_flip() +
