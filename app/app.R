@@ -25,6 +25,7 @@ mAPOST$variable <- NULL
 
 View(mAPOST)
 View(Spark)
+View(Ben)
 
 pdf(NULL)
 
@@ -80,6 +81,8 @@ body <- dashboardBody(tabItems(
        )
  ),
   tabItem("Benedum Grants",
+          fluidRow(valueBox(length(unique(Ben$name)), "Number of Grantees", icon = icon("users"), color = "green")
+          ),
           fluidRow(
             box(sliderInput("BenedumSelect",
                             "Grant Amount:",
