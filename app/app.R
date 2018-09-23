@@ -54,7 +54,8 @@ body <- dashboardBody(tabItems(
                           choices = sort(unique(mAPOST$value)),
                           multiple = TRUE,
                           selectize = TRUE,
-                          selected = c("STEM", "Arts & Culture"))
+                          selected = c("STEM", "Arts & Culture")),
+              actionButton("reset", "Reset Filters", icon = icon("refresh")) 
           )
   ),
           fluidRow(
@@ -127,7 +128,7 @@ ui <- dashboardPage(header, sidebar, body)
 # Define server logic
 server <- function(input, output) {
   APOSTInput <- reactive({
-    DF <- APOST
+    DF <- APOST %>%
     # ORG Filter
     if (length(input$FocusSelect) > 0 ) {
       DF <- subset(DF, value %in% input$FocusSelect)
@@ -137,14 +138,14 @@ server <- function(input, output) {
   })
   # Reactive melted data
   mAPOSTInput <- reactive({
-    mAPOST <- melt(APOSTInput(), id.vars = "Organization")
-    mAPOST$variable <- NULL
+    melt(APOSTInput(), id.vars = "Organization")
+    mAPOSTInput$variable <- NULL
     
     return(mAPOST)
   })
   # APOST Plot
   output$APOSTPlot <- renderPlotly({
-    dat <- mAPOST
+    dat <- mAPOSTInput
       ggplot(data = dat, aes(x = value, fill = "value", na.rm = TRUE)) + 
       geom_bar(stat = "count") + 
       theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1)) +
