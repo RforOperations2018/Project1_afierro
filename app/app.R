@@ -151,14 +151,14 @@ server <- function(input, output) {
   
   SparkInput <- reactive({
     DF <- Spark %>%
-    # ORG Filter
+    # Amt Filter
       filter(Amt >= input$SparkSelect[1] & Amt <= input$SparkSelect[2])
 
       return(DF)
   })
   # Spark Plot
   output$SparkPlot <- renderPlotly({
-    SparkplotInput() %>% 
+    SparkInput() %>% 
       group_by(name) %>% 
       summarise(Amt = sum(Amt))
     ggplot(aes(x = name, y = Amt)) +
@@ -167,12 +167,20 @@ server <- function(input, output) {
       coord_flip() +
       theme(legend.position="none")
   })
+  
+  BenInput <- reactive({
+    DF <- Ben %>%
+      # Amt Filter
+      filter(Amt >= input$BenedumSelect[1] & Amt <= input$BenedumSelect[2])
+    
+    return(DF)
+  })
   # Benedum Plot
   output$BenedumPlot <- renderPlotly({
-    BendedumplotInput() %>% 
+    BenInput() %>% 
       group_by(Organization) %>% 
       summarise(Amt = sum(Amt)) %>%
-      drop_na(Amt) %>%
+      drop_na(Amt)
       ggplot(aes(x = Organization, y = Amt, fill = "Amt")) +
       geom_bar(stat = "identity") +
       labs(x = "Organization", y = "Total Amount Awarded", title = "Benedum Grants") +
