@@ -10,6 +10,7 @@ library(shinythemes)
 library(readxl)
 library(tidyr)
 library(tidyverse)
+library(rsconnect)
 
 Ben1 <- read_excel("Benedum.xlsx")
 colnames(Ben1) <- c("Area", "Organization", "Amt")
@@ -43,7 +44,8 @@ sidebar <- dashboardSidebar(
     menuItem("APOST Table", tabName = "APOST Pittsburgh", icon = icon("clock-o")))
 
 )
-body <- dashboardBody(tabItems(
+body <- dashboardBody(
+  tabItems(
   tabItem("APOST",
           fluidRow(valueBox(length(unique(APOST$Organization)), "Number of Orgs", icon = icon("users"), color = "purple")
                    ),
