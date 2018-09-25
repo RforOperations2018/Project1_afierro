@@ -14,8 +14,9 @@ library(rsconnect)
 
 Ben1 <- read_excel("Benedum.xlsx")
 colnames(Ben1) <- c("Area", "Organization", "Amt")
-Ben1$name <- as.factor(Ben$Organization)
-omit.Ben <- Ben1[240:1048451, ]
+# Make sure you reset R before trying one last time.
+Ben1$name <- as.factor(Ben1$Organization)
+omit.Ben <- Ben1[240:1048451,]
 na.omit(omit.Ben)
 Ben <- drop_na(Ben1)
 
@@ -39,107 +40,120 @@ sidebar <- dashboardSidebar(
   sidebarMenu(
     id = "tabs",
     menuItem("APOST Plot", tabName = "APOST", icon = icon("bar-chart")),
-    menuItem("Spark Grants Plot", tabName = "Spark Grants", icon = icon("money")),
-    menuItem("Benedum Grants Plot", tabName = "Benedum Grants", icon = icon("money")),
-    menuItem("APOST Table", tabName = "APOST Pittsburgh", icon = icon("clock-o")))
+    menuItem("Spark Grants Plot", tabName = "SparkGrants", icon = icon("money")),
+    menuItem("Benedum Grants Plot", tabName = "BenedumGrants", icon = icon("money")),
+    menuItem("APOST Table", tabName = "APOSTPittsburgh", icon = icon("clock-o")))
 
 )
 body <- dashboardBody(
   tabItems(
-  tabItem("APOST",
-          fluidRow(valueBox(length(unique(APOST$Organization)), "Number of Orgs", icon = icon("users"), color = "purple")
-                   ),
-          fluidRow(
-            box(
-              selectInput("FocusSelect",
+    tabItem("APOST",
+            fluidRow(
+              valueBox(length(unique(APOST$Organization)), "Number of Orgs", icon = icon("users"), color = "purple")
+              ),
+            fluidRow(
+              box(
+                selectInput("FocusSelect",
                           "Focus Area:",
                           choices = sort(unique(mAPOST$value)),
                           multiple = TRUE,
                           selectize = TRUE,
                           selected = c("STEM", "Arts & Culture")),
-              actionButton("reset", "Reset Filters", icon = icon("refresh")) 
-          )
-  ),
+                actionButton("reset", "Reset Filters", icon = icon("refresh"))
+                )
+          ),
           fluidRow(
             box(title = "Focus Areas of After School Programs in Pittsburgh",
-                   width = 12,
-                   plotlyOutput("APOSTPlot")
-          )
-    )
-  ),
- tabItem("Spark Grants",
-         fluidRow(valueBox(length(unique(Spark$Name)), "Number of Grantees", icon = icon("users"), color = "red")
-         ),
-         fluidRow(
-           box(
-             sliderInput("SparkSelect",
-                         "Grant Amount:",
-                         min = min(Spark$Amt, na.rm = T),
-                         max = max(Spark$Amt, na.rm = T),
-                         value = c(min(Spark$Amt, na.rm = T), max(Spark$Amt, na.rm = T)),
-                         step = 1,000)
+                width = 12,
+                plotlyOutput("APOSTPlot")
+                )
+            )
+          ),
+    tabItem("SparkGrants",
+            fluidRow(
+              valueBox(length(unique(Spark$Name)), "Number of Grantees", icon = icon("users"), color = "red")
+              ),
+            fluidRow(
+              box(
+                sliderInput("SparkSelect",
+                            "Grant Amount:",
+                            min = min(Spark$Amt, na.rm = T),
+                            max = max(Spark$Amt, na.rm = T),
+                            value = c(min(Spark$Amt, na.rm = T), max(Spark$Amt, na.rm = T)),
+                            step = 1,000)
            )
          ),
-         fluidPage(
+         fluidRow(
            box(title = "Spark Grantees and Amounts",
                   width = 12,
                   (plotlyOutput("SparkPlot"))
-         )
-       )
- ),
-  tabItem("Benedum Grants",
-          fluidRow(valueBox(length(unique(Ben$name)), "Number of Grantees", icon = icon("users"), color = "green")
-          ),
-          fluidRow(
-            box(sliderInput("BenedumSelect",
+               )
+           )
+         ),
+    tabItem("BenedumGrants",
+            fluidRow(
+              valueBox(length(unique(Ben1$name)), "Number of Grantees", icon = icon("users"), color = "green")
+              ),
+            fluidRow(
+              box(
+                sliderInput("BenedumSelect",
                             "Grant Amount:",
                             min = min(Ben$Amt, na.rm = T),
                             max = max(Ben$Amt, na.rm = T),
                             value = c(min(Ben$Amt, na.rm = T), max(Ben$Amt, na.rm = T)),
-                                  step = 10,000)
+                            step = 10,000)
             )
           ),
-          fluidPage(
+          fluidRow(
             box(title = "Benedum Grantees and Amounts",
-                   width = 12,
-                   (plotlyOutput("BenedumPlot"))
-          )
-      )
-),
- tabItem("APOST Pittsburgh",
-           fluidRow(
-             box(selectInput("OrgSelect",
-                             "Organization:",
-                             choices = sort(unique(APOSTtable$Organization)),
-                             multiple = TRUE,
-                             selectize = TRUE,
-                             selected = c("University of Pittsburgh", "Carnegie Science Center"))
-             )),
+                width = 12,
+                plotlyOutput("BenedumPlot")
+                )
+            )
+          ),
+    tabItem("APOSTPittsburgh",
+            fluidRow(
+              box(
+                selectInput("OrgSelect",
+                            "Organization:",
+                            choices = sort(unique(APOSTtable$Organization)),
+                            multiple = TRUE,
+                            selectize = TRUE,
+                            selected = c("University of Pittsburgh", "Carnegie Science Center"))
+                 )
+             ),
          fluidRow(
-           box(inputPanel(
-             downloadButton("downloadData","Download APOST Data")
-           ))),
-           fluidPage(
-             box(DT::dataTableOutput("table")
-                 
-             ))
-)
-  ))
+           box(
+               downloadButton("downloadData","Download APOST Data")
+             )
+           ),
+           fluidRow(
+             box(width = 12,
+               DT::dataTableOutput("table")
+               )
+             )
+         )
+    )
+  )
+
 ui <- dashboardPage(header, sidebar, body)
 
 # Define server logic
-server <- function(input, output) {
+server <- function(input, output, session) {
   APOSTInput <- reactive({
-    APOSTreac <- APOST %>%
-    # ORG Filter
+    # Pipes need to be connected to something
+    APOSTreac <- APOST
+      # ORG Filter
     if (length(input$FocusSelect) > 0 ) {
-      APOSTreac <- subset(APOSTreac, value %in% input$FocusSelect)
+      # Wrong column name
+      APOSTreac <- subset(APOSTreac, `Primary Focus Area` %in% input$FocusSelect)
     }
     
     return(APOSTreac)
   })
   
   observeEvent(input$reset, {
+    # You have the wrong selecteds here
     updateSelectInput(session, "FocusSelect", selected = c("University of Pittsburgh", "Carnegie Science Center"))
   })
   # Reactive melted data
@@ -149,7 +163,8 @@ server <- function(input, output) {
   })
   # APOST Plot
   output$APOSTPlot <- renderPlotly({
-    dat <- mAPOST
+    # You have to call your reactive data as a function
+    dat <- mAPOSTInput()
       ggplot(data = dat, aes(x = value, fill = "value", na.rm = TRUE)) + 
       geom_bar(stat = "count") + 
       theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1)) +
@@ -166,9 +181,11 @@ server <- function(input, output) {
   })
   # Spark Plot
   output$SparkPlot <- renderPlotly({
-    dat <- Spark %>%
+    # Again with not calling the function
+    dat <- SparkInput() %>%
       group_by(Name) %>% 
       summarise(Amt = sum(Amt))
+    
     ggplot(data = dat, aes(x = Name, y = Amt)) +
       geom_bar(stat = "identity", fill = "#663096") +
       labs(x = "Grantee", y = "Total Amount Awarded", title = "Spark Grants") +
@@ -185,7 +202,7 @@ server <- function(input, output) {
   })
   # Benedum Plot
   output$BenedumPlot <- renderPlotly({
-    dat <- Ben
+    dat <- BenInput()
       ggplot(data = dat, aes(x = name, y = Amt, fill = "Amt")) +
       geom_bar(stat = "identity") +
       labs(x = "Grantee", y = "Total Amount Awarded", title = "Benedum Grants") +
@@ -204,17 +221,19 @@ server <- function(input, output) {
   })
   output$downloadData <- downloadHandler(
     filename = function() {
-      paste(input$APOSTtable, Sys.Date(), ".csv", sep="")
+      paste("data", Sys.Date(), ".csv", sep="")
     },
     content = function(file) {
-      write.csv(APOSTTbleInput(), file)
+      # Close but you misspelled it
+      write.csv(APOSTTableInput(), file)
     }
   ) 
   #APOST Table
   output$table <- DT::renderDataTable({
-    APOSTtable
+    # Reactive functions need the parens, and spelled correctly
+    APOSTTableInput()
   })
-  }
+}
 
 # Run the application 
 shinyApp(ui = ui, server = server)
