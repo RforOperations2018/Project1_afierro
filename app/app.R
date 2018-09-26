@@ -14,7 +14,7 @@ library(rsconnect)
 
 Ben1 <- read_excel("Benedum.xlsx")
 colnames(Ben1) <- c("Area", "Organization", "Amt")
-Ben1$name <- as.factor(Ben$Organization)
+Ben1$name <- as.factor(Ben1$Organization)
 omit.Ben <- Ben1[240:1048451, ]
 na.omit(omit.Ben)
 Ben <- drop_na(Ben1)
